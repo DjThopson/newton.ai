@@ -1,0 +1,61 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<title>Post</title>
+
+</head>
+
+<body>
+<div id='initial'>
+	No recommendations yet.
+<br>
+<button name='update' onclick="update()">Update</button> 
+</div>
+
+<div id='recommend' align="center">
+
+</div>
+	
+
+<script>
+function update(){
+	//sessionStorage || localStorage 
+	var session = sessionStorage['recommend'] || 'defaultValue';
+
+	if (session=='defaultValue'){
+		array = []
+		{% for x in post %}
+			array.push({{x.pk}})
+		{% endfor %}
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", "/recommend/", true);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.onreadystatechange = function() {
+    	if (xhr.readyState == XMLHttpRequest.DONE) {
+        	obj = JSON.parse(xhr.response);
+        	document.getElementById('recommend').innerHTML = '<h2>'+obj.title+'</h2><img src="'+obj.image+'" width="300" height="300"><p>Created by: '+obj.user_add+'</p><p>'+obj.content+'</p>';
+    		document.getElementById("initial").setAttribute("style", "display: none;"); 
+    		}
+		}
+		xhr.send(JSON.stringify(
+			{
+				"ids":array
+			}
+			));	
+		sessionStorage['recommend'] = 'done';
+	}
+}
+
+var session = sessionStorage['recommend'] || 'defaultValue';
+
+if(session!='defaultValue'){
+	document.getElementById("initial").setAttribute("style", "display: none;"); 	
+}
+
+
+</script>
+</body>
+
+
+
+</html> 
